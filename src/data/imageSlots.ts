@@ -13,6 +13,7 @@ export const slotAssets = {
   'cocurric_collage_big': '/images/slots/cocurric_collage_big.webp',
   'cocurric_collage_big_b': '/images/slots/cocurric_collage_big_b.webp',
   'cocurric_collage_big_c': '/images/slots/cocurric_collage_big_c.webp',
+  'coming_portrait': '/images/slots/hero-protrait-color.jpg',
   'hero_portrait': '/images/slots/hero_portrait.webp',
   'highlight_fairmark': '/images/slots/highlight_fairmark.webp',
   'highlight_mentor': '/images/slots/highlight_mentor.webp',

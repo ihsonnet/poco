@@ -5,17 +5,19 @@ import { navItems, profile } from '@/data/portfolio';
 
 interface NavigationProps {
   dark: boolean;
+  homeHref?: string;
+  linkPrefix?: string;
   menuOpen: boolean;
   onToggleDark: () => void;
   onToggleMenu: () => void;
   onCloseMenu: () => void;
 }
 
-export function Navigation({ dark, menuOpen, onToggleDark, onToggleMenu, onCloseMenu }: NavigationProps) {
+export function Navigation({ dark, homeHref = '#top', linkPrefix = '', menuOpen, onToggleDark, onToggleMenu, onCloseMenu }: NavigationProps) {
   return (
     <nav className="snav">
       <div className="nav-top">
-        <a href="#top" className="nav-brand" onClick={onCloseMenu}>
+        <a href={homeHref} className="nav-brand" onClick={onCloseMenu}>
           <span className="brand-mark"><span /></span>
           <span>{profile.brand}</span>
         </a>
@@ -24,7 +26,7 @@ export function Navigation({ dark, menuOpen, onToggleDark, onToggleMenu, onClose
         </button>
       </div>
       <div className={`nav-links ${menuOpen ? 'open' : ''}`} onClick={onCloseMenu}>
-        {navItems.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
+        {navItems.map((item) => <a key={item.href} href={`${linkPrefix}${item.href}`}>{item.label}</a>)}
         <div className="nav-spacer" />
         <button onClick={onToggleDark} aria-label="Toggle dark mode" className="theme-toggle" type="button">
           {dark ? <Sun size={17} strokeWidth={1.8} /> : <Moon size={17} strokeWidth={1.8} />}

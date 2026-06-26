@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'IHSONNET — Developer Portfolio',
+  title: 'Portfolio — Injamamul Haque Sonet | Education Technologist, Software Security Engineer, System Architect, AI and Space Researcher',
   description: 'GitHub Universe inspired one-screen portfolio for Injamamul Haque Sonet.'
 };
 

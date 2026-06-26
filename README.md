@@ -21,6 +21,11 @@ npm run dev
 
 Open `http://localhost:3000`.
 
+## Coming soon mode
+
+Set `COMING_SOON_MODE=true` to redirect every normal page route, including `/`, to `/coming-soon`.
+Leave it unset or `false` to show the full portfolio site; `/coming-soon` redirects back to `/` while the flag is off.
+
 ## Build
 
 ```bash
