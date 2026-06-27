@@ -11,7 +11,7 @@ export function Research() {
 
   return (
     <section>
-      <SectionHeader id="research" eyebrow="research · public frameworks" title="research" action="read papers" href="mailto:ihsonnet@gmail.com" compact />
+      <SectionHeader id="research" eyebrow="research · public frameworks" title="research" action="read papers" href="/view/research" compact />
       <div className="research-grid stack2">
         <div className="research-cover">
           <div className="research-cover-label"><span>cover-preview</span><span>{featured.tag}</span></div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getContentHref } from '@/data/content';
 import { projectSets } from '@/data/portfolio';
 import { ImageSlot } from '@/components/ui/ImageSlot';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -20,7 +21,7 @@ export function Projects() {
 
   return (
     <section>
-      <SectionHeader id="work" eyebrow="projects / case studies" title="selected-work" action="all projects" href="https://github.com/ihsonnet" compact />
+      <SectionHeader id="work" eyebrow="projects / case studies" title="selected-work" action="all projects" href="/view/projects" compact />
       <div className="proj-tabs">
         {tabs.map((item) => <button key={item.key} type="button" onClick={() => setTab(item.key)} className={item.key === tab ? 'active' : ''}>{item.label}<span aria-hidden="true" /></button>)}
       </div>
@@ -36,7 +37,7 @@ export function Projects() {
               <em>{project.category}</em>
               <p>{project.desc}</p>
               <TagList tags={project.tech} small />
-              <a href="#">View case study ↗</a>
+              <a href={getContentHref('project', project.name)}>View case study ↗</a>
             </div>
           </article>
         ))}

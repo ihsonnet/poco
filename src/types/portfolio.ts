@@ -92,6 +92,7 @@ export interface MediaItem {
   kind: string;
   outlet: string;
   title: string;
+  href?: string;
 }
 
 export interface BlogItem {

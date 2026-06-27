@@ -1,3 +1,4 @@
+import { getContentHref } from '@/data/content';
 import { awards, honors } from '@/data/portfolio';
 import { ImageSlot } from '@/components/ui/ImageSlot';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -6,7 +7,7 @@ export function Recognition() {
   return (
     <section>
       <div className="gap-line" />
-      <SectionHeader id="recognition" eyebrow="most-inspirational-award · 2022" title="global-recognition" action="all awards" compact />
+      <SectionHeader id="recognition" eyebrow="most-inspirational-award · 2022" title="global-recognition" action="all awards" href="/view/awards" compact />
       <div className="recognition-stack stack2">
         <div className="recognition-copy fixedh">
           <h3>Most Inspirational Award</h3>
@@ -30,17 +31,17 @@ export function Recognition() {
       </div>
       <div className="awards-grid s4">
         {awards.map((award) => (
-          <article className="award-card" key={`${award.year}-${award.title}`}>
+          <a href={getContentHref('award', award.title)} className="award-card" key={`${award.year}-${award.title}`}>
             <span style={{ color: award.color }}>{award.year}</span>
             <h3>{award.title}</h3>
             <p>{award.org}</p>
-          </article>
+          </a>
         ))}
       </div>
-      <SectionHeader eyebrow="honors · distinctions" title="other-awards-&-honors" action="view all" compact />
+      <SectionHeader eyebrow="honors · distinctions" title="other-awards-&-honors" action="view all" href="/view/awards" compact />
       <div className="honors-grid s4">
         {honors.map((honor) => (
-          <article className="honor-card" key={`${honor.year}-${honor.title}`}>
+          <a href={getContentHref('honor', honor.title)} className="honor-card" key={`${honor.year}-${honor.title}`}>
             <div className="honor-img"><ImageSlot slot={honor.slot} placeholder={honor.placeholder} alt={honor.title} /></div>
             <div className="honor-body">
               <span>{honor.year}</span>
@@ -48,7 +49,7 @@ export function Recognition() {
               <p>{honor.org}</p>
               <i>↗</i>
             </div>
-          </article>
+          </a>
         ))}
       </div>
     </section>

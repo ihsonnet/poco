@@ -10,6 +10,7 @@ function isComingSoonModeEnabled() {
 
 function isPublicAsset(pathname: string) {
   return (
+    pathname.startsWith('/admin') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/images') ||
     pathname === '/favicon.ico' ||

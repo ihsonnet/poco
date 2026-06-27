@@ -11,7 +11,7 @@ export function JudgingMentoring() {
 
   return (
     <section>
-      <SectionHeader id="judging" eyebrow="judge · mentor · setter" title="judging-mentoring" action="full record" href="mailto:ihsonnet@gmail.com" compact />
+      <SectionHeader id="judging" eyebrow="judge · mentor · setter" title="judging-mentoring" action="full record" href="/view/judging" compact />
       <div className="judging-stack stack2">
         <div className="judging-list">
           {judging.map((item, index) => (

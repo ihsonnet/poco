@@ -25,6 +25,29 @@ Open `http://localhost:3000`.
 
 Set `COMING_SOON_MODE=true` to redirect every normal page route, including `/`, to `/coming-soon`.
 Leave it unset or `false` to show the full portfolio site; `/coming-soon` redirects back to `/` while the flag is off.
+Admin routes under `/admin` remain available so content can be managed while the public site is hidden.
+
+## PostgreSQL admin panel
+
+The project includes a lightweight PostgreSQL-backed content admin at `/admin`.
+
+Required environment variables:
+
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ihsonnet
+DATABASE_SSL=false
+ADMIN_PASSWORD=change-me
+ADMIN_SECRET=change-me-to-a-long-random-string
+```
+
+Run the initial migration:
+
+```bash
+npm run db:migrate
+```
+
+Then visit `http://localhost:3000/admin/login`. The admin can create and edit posts with title, slug, type, route, post status (`draft`, `published`, `archived`), tags, cover slot, external URL, rich text paragraphs, gallery rows, and attachments.
+Only `published` database records are read by `/view/[slug]`, `/blog/[slug]`, and `/details/[slug]`; `draft` and `archived` records stay hidden from the public site. If the database is not configured or has no published records, the current static portfolio content remains the fallback.
 
 ## Build
 

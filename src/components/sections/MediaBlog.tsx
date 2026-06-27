@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getContentHref, getContentPrimaryHref } from '@/data/content';
 import { blog, media } from '@/data/portfolio';
 import { ImageSlot } from '@/components/ui/ImageSlot';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -17,11 +18,17 @@ export function MediaSection() {
 
   return (
     <section>
-      <SectionHeader id="media" eyebrow="press · video · social" title="news-&-media" action="all coverage" compact />
+      <SectionHeader id="media" eyebrow="press · video · social" title="news-&-media" action="all coverage" href="/view/media" compact />
       <div className="media-scroller scroller">
         <div className="media-track" style={{ transform: `translateX(-${mediaIndex * 25}%)` }}>
           {mediaTrack.map((item, itemIndex) => (
-            <a href="#" className="media-card" key={`${item.title}-${itemIndex}`}>
+            <a
+              href={getContentPrimaryHref('media', item.title)}
+              className="media-card"
+              key={`${item.title}-${itemIndex}`}
+              target={item.href ? '_blank' : undefined}
+              rel={item.href ? 'noreferrer' : undefined}
+            >
               <div className="media-img">
                 <span className="media-kind">{item.kind}</span>
                 <ImageSlot slot={item.slot} placeholder={item.placeholder} alt={item.title} />
@@ -29,7 +36,7 @@ export function MediaSection() {
               <div className="media-body">
                 <span>{item.outlet}</span>
                 <h3>{item.title}</h3>
-                <i>watch ↗</i>
+                <i>{item.href ? 'open source' : 'watch'} ↗</i>
               </div>
             </a>
           ))}
@@ -42,10 +49,10 @@ export function MediaSection() {
 export function BlogSection() {
   return (
     <section>
-      <SectionHeader id="writing" eyebrow="essays · field notes" title="blog" action="all posts" compact />
+      <SectionHeader id="writing" eyebrow="essays · field notes" title="blog" action="all posts" href="/view/blog" compact />
       <div className="blog-grid s3">
         {blog.map((item) => (
-          <a href="#" className="blog-card" key={item.title}>
+          <a href={getContentHref('blog', item.title)} className="blog-card" key={item.title}>
             <div className="blog-img"><ImageSlot slot={item.slot} placeholder={item.placeholder} alt={item.title} /></div>
             <div className="blog-body">
               <span>{item.tag}</span>
