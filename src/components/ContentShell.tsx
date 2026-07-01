@@ -2,6 +2,8 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
+import type { SiteSettings } from '@/lib/siteSettings';
+import { buildSiteThemeVars, getThemeBackground } from '@/lib/themeStyles';
 import { Footer } from '@/components/sections/Footer';
 import { FinalCTA } from '@/components/sections/FinalCTA';
 import { Navigation } from '@/components/sections/Navigation';
@@ -14,7 +16,7 @@ function shouldUseDarkByLocalTime() {
   return hour < 7 || hour >= 19;
 }
 
-export function ContentShell({ children }: { children: ReactNode }) {
+export function ContentShell({ children, settings }: { children: ReactNode; settings: SiteSettings }) {
   const [dark, setDark] = useState(false);
   const [themeReady, setThemeReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,8 +30,8 @@ export function ContentShell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!themeReady) return;
-    document.body.style.background = dark ? '#010409' : '#e8ebe7';
-  }, [dark, themeReady]);
+    document.body.style.background = getThemeBackground(settings, dark);
+  }, [dark, settings, themeReady]);
 
   const handleToggleDark = () => {
     setDark((value) => {
@@ -41,8 +43,9 @@ export function ContentShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <main className={`sonet-root content-root ${dark ? 'dark' : ''}`}>
+    <main className={`sonet-root content-root ${dark ? 'dark' : ''}`} style={buildSiteThemeVars(settings, dark)}>
       <Navigation
+        settings={settings}
         dark={dark}
         homeHref="/"
         linkPrefix="/"
@@ -54,8 +57,8 @@ export function ContentShell({ children }: { children: ReactNode }) {
       <div className="full-bleed-line" />
       {children}
       <div className="gap-line" />
-      <FinalCTA />
-      <Footer />
+      <FinalCTA email={settings.contactEmail} />
+      <Footer settings={settings} />
     </main>
   );
 }

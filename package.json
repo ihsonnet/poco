@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "db:migrate": "psql \"$DATABASE_URL\" -f database/migrations/001_content_admin.sql"
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:seed": "tsc -p scripts/tsconfig.seed.json && node .tmp/seed/scripts/seed.js"
   },
   "dependencies": {
     "lucide-react": "^1.21.0",

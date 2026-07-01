@@ -1,9 +1,12 @@
 import type { PoolClient, QueryResultRow } from 'pg';
 import { randomUUID } from 'node:crypto';
 import { dbQuery, withTransaction } from '@/lib/db';
+import { ensureContentSchema } from '@/lib/contentSchema';
 import { slugify } from '@/data/content';
+import { saveUploadedImage, saveUploadedImages } from '@/lib/uploads';
 
 export type PublicationStatus = 'draft' | 'published' | 'archived';
+type AdminGalleryInput = { slot?: string; imageUrl?: string; caption: string; alt: string };
 
 export interface AdminPostListItem extends QueryResultRow {
   id: string;
@@ -13,6 +16,7 @@ export interface AdminPostListItem extends QueryResultRow {
   title: string;
   subtitle: string;
   cover_slot: string | null;
+  cover_image_url: string | null;
   publication_status: PublicationStatus;
   published: boolean;
   featured: boolean;
@@ -33,7 +37,7 @@ export interface AdminPost extends AdminPostListItem {
   sort_order: number;
   seo_title: string | null;
   seo_description: string | null;
-  gallery: Array<{ slot: string; caption: string; alt: string }>;
+  gallery: AdminGalleryInput[];
   attachments: Array<{ label: string; href: string; type: string }>;
 }
 
@@ -47,6 +51,7 @@ export interface AdminPostInput {
   excerpt: string;
   body: string[];
   coverSlot: string;
+  coverImageUrl: string;
   coverFit: 'cover' | 'contain';
   year: string;
   location: string;
@@ -59,11 +64,13 @@ export interface AdminPostInput {
   seoTitle: string;
   seoDescription: string;
   tags: string[];
-  gallery: Array<{ slot: string; caption: string; alt: string }>;
+  gallery: AdminGalleryInput[];
   attachments: Array<{ label: string; href: string; type: string }>;
 }
 
 export async function listAdminPosts() {
+  await ensureContentSchema();
+
   return dbQuery<AdminPostListItem>(`
     select
       ci.id,
@@ -73,6 +80,7 @@ export async function listAdminPosts() {
       ci.title,
       ci.subtitle,
       ci.cover_slot,
+      ci.cover_image_url,
       ci.publication_status,
       ci.published,
       ci.featured,
@@ -87,12 +95,14 @@ export async function listAdminPosts() {
 }
 
 export async function getAdminPost(id: string) {
+  await ensureContentSchema();
+
   const rows = await dbQuery<AdminPost>(`
     select
       ci.*,
       coalesce(array_agg(ct.name order by ct.name) filter (where ct.id is not null), '{}') as tags,
       coalesce((
-        select jsonb_agg(jsonb_build_object('slot', cgi.slot, 'caption', cgi.caption, 'alt', cgi.alt) order by cgi.sort_order)
+        select jsonb_agg(jsonb_build_object('slot', cgi.slot, 'imageUrl', cgi.image_url, 'caption', cgi.caption, 'alt', cgi.alt) order by cgi.sort_order)
         from content_gallery_images cgi
         where cgi.content_id = ci.id
       ), '[]'::jsonb) as gallery,
@@ -137,9 +147,9 @@ async function syncGallery(client: PoolClient, contentId: string, gallery: Admin
 
   for (const [index, image] of gallery.entries()) {
     await client.query(`
-      insert into content_gallery_images (id, content_id, slot, alt, caption, sort_order)
-      values ($1, $2, $3, $4, $5, $6)
-    `, [randomUUID(), contentId, image.slot, image.alt, image.caption, index]);
+      insert into content_gallery_images (id, content_id, slot, image_url, alt, caption, sort_order)
+      values ($1, $2, $3, $4, $5, $6, $7)
+    `, [randomUUID(), contentId, image.slot || null, image.imageUrl || null, image.alt, image.caption, index]);
   }
 }
 
@@ -155,15 +165,17 @@ async function syncAttachments(client: PoolClient, contentId: string, attachment
 }
 
 export async function createAdminPost(input: AdminPostInput) {
+  await ensureContentSchema();
+
   return withTransaction(async (client) => {
     const id = randomUUID();
 
     await client.query(`
       insert into content_items (
         id, slug, type, route, title, subtitle, eyebrow, excerpt, body, cover_slot, cover_fit,
-        year, location, status, status_color, external_url, publication_status, published, featured, sort_order, seo_title, seo_description
+        cover_image_url, year, location, status, status_color, external_url, publication_status, published, featured, sort_order, seo_title, seo_description
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
     `, [
       id,
       input.slug,
@@ -176,6 +188,7 @@ export async function createAdminPost(input: AdminPostInput) {
       JSON.stringify(input.body),
       input.coverSlot || null,
       input.coverFit,
+      input.coverImageUrl || null,
       input.year || null,
       input.location || null,
       input.status || null,
@@ -198,6 +211,8 @@ export async function createAdminPost(input: AdminPostInput) {
 }
 
 export async function updateAdminPost(id: string, input: AdminPostInput) {
+  await ensureContentSchema();
+
   await withTransaction(async (client) => {
     await client.query(`
       update content_items
@@ -212,17 +227,18 @@ export async function updateAdminPost(id: string, input: AdminPostInput) {
         body = $9::jsonb,
         cover_slot = $10,
         cover_fit = $11,
-        year = $12,
-        location = $13,
-        status = $14,
-        status_color = $15,
-        external_url = $16,
-        publication_status = $17,
-        published = $18,
-        featured = $19,
-        sort_order = $20,
-        seo_title = $21,
-        seo_description = $22
+        cover_image_url = $12,
+        year = $13,
+        location = $14,
+        status = $15,
+        status_color = $16,
+        external_url = $17,
+        publication_status = $18,
+        published = $19,
+        featured = $20,
+        sort_order = $21,
+        seo_title = $22,
+        seo_description = $23
       where id = $1
     `, [
       id,
@@ -236,6 +252,7 @@ export async function updateAdminPost(id: string, input: AdminPostInput) {
       JSON.stringify(input.body),
       input.coverSlot || null,
       input.coverFit,
+      input.coverImageUrl || null,
       input.year || null,
       input.location || null,
       input.status || null,
@@ -256,10 +273,26 @@ export async function updateAdminPost(id: string, input: AdminPostInput) {
 }
 
 export async function deleteAdminPost(id: string) {
+  await ensureContentSchema();
+
   await dbQuery('delete from content_items where id = $1', [id]);
 }
 
-export function parseAdminPostInput(formData: FormData): AdminPostInput {
+function parseGalleryLine(line: string, title: string): AdminGalleryInput | null {
+  const [source = '', caption = '', alt = ''] = line.split('|').map((value) => value.trim());
+  if (!source) return null;
+
+  const galleryImage = {
+    caption,
+    alt: alt || `${title} gallery image`
+  };
+
+  return source.startsWith('/') || source.startsWith('http')
+    ? { ...galleryImage, imageUrl: source }
+    : { ...galleryImage, slot: source };
+}
+
+export async function parseAdminPostInput(formData: FormData): Promise<AdminPostInput> {
   const get = (name: string) => String(formData.get(name) ?? '').trim();
   const type = get('type') || 'project';
   const title = get('title');
@@ -269,10 +302,17 @@ export function parseAdminPostInput(formData: FormData): AdminPostInput {
     : 'draft';
   const body = get('body').split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean);
   const tags = get('tags').split(',').map((tag) => tag.trim()).filter(Boolean);
-  const gallery = get('gallery').split('\n').map((line) => {
-    const [slot = '', caption = '', alt = ''] = line.split('|').map((value) => value.trim());
-    return slot ? { slot, caption, alt: alt || `${title} gallery image` } : null;
-  }).filter((image): image is { slot: string; caption: string; alt: string } => Boolean(image));
+  const uploadPrefix = slugify(get('slug') || title || type || 'post');
+  const coverImageUrl = await saveUploadedImage(formData.get('coverImage'), uploadPrefix || 'cover', 'covers');
+  const gallery = get('gallery').split('\n')
+    .map((line) => parseGalleryLine(line, title))
+    .filter((image): image is AdminGalleryInput => Boolean(image));
+  const uploadedGalleryUrls = await saveUploadedImages(formData.getAll('galleryImages'), uploadPrefix || 'gallery', 'gallery');
+  const uploadedGallery = uploadedGalleryUrls.map((imageUrl, index) => ({
+    imageUrl,
+    caption: `uploaded image ${index + 1}`,
+    alt: `${title} gallery image ${gallery.length + index + 1}`
+  }));
   const attachments = get('attachments').split('\n').map((line) => {
     const [label = '', href = '', typeValue = 'external'] = line.split('|').map((value) => value.trim());
     const attachmentType = ['external', 'download', 'reference'].includes(typeValue) ? typeValue : 'external';
@@ -289,6 +329,7 @@ export function parseAdminPostInput(formData: FormData): AdminPostInput {
     excerpt: get('excerpt'),
     body,
     coverSlot: get('coverSlot'),
+    coverImageUrl: coverImageUrl || get('coverImageUrl'),
     coverFit: get('coverFit') === 'contain' ? 'contain' : 'cover',
     year: get('year'),
     location: get('location'),
@@ -301,7 +342,7 @@ export function parseAdminPostInput(formData: FormData): AdminPostInput {
     seoTitle: get('seoTitle'),
     seoDescription: get('seoDescription'),
     tags,
-    gallery,
+    gallery: [...gallery, ...uploadedGallery],
     attachments
   };
 }

@@ -17,7 +17,7 @@ export function DetailPage({ post, related }: DetailPageProps) {
       ]} />
       <header className="detail-hero">
         <div className="detail-cover">
-          <ImageSlot slot={post.coverSlot} fit={post.coverFit ?? 'cover'} placeholder="Drop cover image" alt={post.title} />
+          <ImageSlot slot={post.coverSlot} src={post.coverImageUrl} fit={post.coverFit ?? 'cover'} placeholder="Drop cover image" alt={post.title} />
         </div>
         <div className="detail-heading">
           <span className="section-eyebrow">{post.eyebrow}</span>
@@ -62,9 +62,9 @@ export function DetailPage({ post, related }: DetailPageProps) {
               <h2>photo-gallery<span>/</span></h2>
               <div className="detail-gallery-grid">
                 {post.gallery.map((image) => (
-                  <figure key={`${image.slot}-${image.caption ?? image.alt}`}>
+                  <figure key={`${image.imageUrl ?? image.slot}-${image.caption ?? image.alt}`}>
                     <div>
-                      <ImageSlot slot={image.slot} placeholder="Drop gallery image" alt={image.alt} />
+                      <ImageSlot slot={image.slot} src={image.imageUrl} placeholder="Drop gallery image" alt={image.alt} />
                     </div>
                     {image.caption ? <figcaption>{image.caption}</figcaption> : null}
                   </figure>
@@ -92,7 +92,7 @@ export function DetailPage({ post, related }: DetailPageProps) {
                 rel={isExternalPost(item) ? 'noreferrer' : undefined}
               >
                 <div className="related-cover">
-                  <ImageSlot slot={item.coverSlot} fit={item.coverFit ?? 'cover'} placeholder="Drop cover image" alt={item.title} />
+                  <ImageSlot slot={item.coverSlot} src={item.coverImageUrl} fit={item.coverFit ?? 'cover'} placeholder="Drop cover image" alt={item.title} />
                 </div>
                 <div className="related-copy">
                   <span>{item.eyebrow}</span>

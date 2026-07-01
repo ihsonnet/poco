@@ -148,7 +148,7 @@ export function CollectionPage({ collection, activeTag }: CollectionPageProps) {
               rel={isExternalPost(post) ? 'noreferrer' : undefined}
             >
               <div className="archive-card-cover">
-                <ImageSlot slot={post.coverSlot} fit={post.coverFit ?? 'cover'} placeholder="Drop cover image" alt={post.title} />
+                <ImageSlot slot={post.coverSlot} src={post.coverImageUrl} fit={post.coverFit ?? 'cover'} placeholder="Drop cover image" alt={post.title} />
               </div>
               <div className="archive-card-body">
                 <div className="archive-card-meta">

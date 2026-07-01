@@ -3,7 +3,8 @@
 import { Bot, MapPin, Moon, Satellite, Shield, Sun } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
-import { profile } from '@/data/portfolio';
+import type { SiteSettings } from '@/lib/siteSettings';
+import { buildSiteThemeVars, getThemeBackground } from '@/lib/themeStyles';
 import { ImageSlot } from '@/components/ui/ImageSlot';
 
 const TYPEWRITER_TEXT = 'Full portfolio coming soon.';
@@ -21,7 +22,7 @@ const focusAreas = [
   { label: 'Space Tech', icon: Satellite, color: '#58a6ff' }
 ] as const;
 
-export function ComingSoonPage() {
+export function ComingSoonPage({ settings }: { settings: SiteSettings }) {
   const [dark, setDark] = useState(true);
   const [typedText, setTypedText] = useState('');
 
@@ -32,8 +33,8 @@ export function ComingSoonPage() {
   }, []);
 
   useEffect(() => {
-    document.body.style.background = dark ? '#010409' : '#e8ebe7';
-  }, [dark]);
+    document.body.style.background = getThemeBackground(settings, dark);
+  }, [dark, settings]);
 
   useEffect(() => {
     const isComplete = typedText === TYPEWRITER_TEXT;
@@ -55,7 +56,7 @@ export function ComingSoonPage() {
   };
 
   return (
-    <main className={`sonet-root coming-root ${dark ? 'dark' : ''}`}>
+    <main className={`sonet-root coming-root ${dark ? 'dark' : ''}`} style={buildSiteThemeVars(settings, dark)}>
       <section className="coming-stage">
         <div className="coming-card">
           <button className="coming-theme-toggle" type="button" onClick={handleToggleDark} aria-label="Toggle theme">
@@ -63,10 +64,10 @@ export function ComingSoonPage() {
           </button>
           <div className="coming-grid">
             <div className="coming-portrait">
-              <ImageSlot slot="coming_portrait" placeholder="Portrait" alt="Injamamul Haque Sonet" />
+              <ImageSlot src={settings.heroImageUrl || undefined} slot={settings.heroImageUrl ? undefined : (settings.heroImageSlot || 'coming_portrait')} placeholder="Portrait" alt={`${settings.heroName} ${settings.heroLastName}`} />
             </div>
             <div className="coming-copy">
-              <h1>Injamamul Haque Sonet<span>/</span></h1>
+              <h1>{settings.heroName} {settings.heroLastName}<span>/</span></h1>
               <div className="coming-roles">
                 <span>Software Security Engineer</span>
                 <i />
@@ -74,13 +75,13 @@ export function ComingSoonPage() {
                 <i />
                 <span>AI Researcher</span>
               </div>
-              <p className="coming-location"><MapPin size={15} strokeWidth={1.8} /> Alexandria, VA, USA</p>
+              <p className="coming-location"><MapPin size={15} strokeWidth={1.8} /> {settings.heroLocation}</p>
             </div>
           </div>
 
           <div className="coming-body">
             <p>
-              I design scalable, reliable, and security-conscious systems — from AI-powered products and multi-agent workflows to cloud-native architectures. My work spans intelligent agents, RAG, MCP, and modern secure software development.
+              {settings.heroLede}
             </p>
             <p>
               I served as System Architect & Technical Lead for <strong>Diamond in the Sky</strong>, a NASA International Space Apps Challenge 2022 <em>Global Champion</em> project. I continue to contribute through research, technical mentoring, and emerging technology initiatives.
@@ -97,17 +98,17 @@ export function ComingSoonPage() {
           </div>
 
           <div className="coming-actions">
-            <a href={profile.github}>GitHub <span>↗</span></a>
-            <a href={profile.linkedin}>LinkedIn <span>↗</span></a>
+            <a href={settings.githubUrl}>GitHub <span>↗</span></a>
+            <a href={settings.linkedinUrl}>LinkedIn <span>↗</span></a>
           </div>
         </div>
       </section>
       <footer className="coming-footer">
         <div>
           <b>#</b>
-          <span><strong>Injamamul Haque Sonet</strong><small>Designing secure, scalable, AI-first systems.</small></span>
+          <span><strong>{settings.heroName} {settings.heroLastName}</strong><small>Designing secure, scalable, AI-first systems.</small></span>
         </div>
-        <p>© 2026 Injamamul Haque Sonet. All rights reserved.</p>
+        <p>{settings.footerCopyright}. All rights reserved.</p>
       </footer>
     </main>
   );

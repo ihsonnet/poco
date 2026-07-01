@@ -6,14 +6,15 @@ const assets: Record<string, string | undefined> = slotAssets;
 
 interface ImageSlotProps {
   slot?: string;
+  src?: string;
   alt?: string;
   placeholder?: string;
   className?: string;
   fit?: Fit;
 }
 
-export function ImageSlot({ slot, alt = '', placeholder = 'Image here', className = '', fit = 'cover' }: ImageSlotProps) {
-  const src = slot ? assets[slot] : undefined;
+export function ImageSlot({ slot, src: imageSrc, alt = '', placeholder = 'Image here', className = '', fit = 'cover' }: ImageSlotProps) {
+  const src = imageSrc || (slot ? assets[slot] : undefined);
 
   if (!src) {
     return (

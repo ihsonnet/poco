@@ -4,6 +4,7 @@ import { ContentShell } from '@/components/ContentShell';
 import { DetailPage } from '@/components/DetailPage';
 import { detailContentPosts } from '@/data/content';
 import { getRuntimePost, getRuntimeRelatedPosts } from '@/lib/publicContent';
+import { getRuntimeSiteSettings } from '@/lib/siteSettings';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -36,7 +37,7 @@ export default async function Page({ params }: PageProps) {
   if (!post || post.type === 'blog') notFound();
 
   return (
-    <ContentShell>
+    <ContentShell settings={await getRuntimeSiteSettings()}>
       <DetailPage post={post} related={await getRuntimeRelatedPosts(post)} />
     </ContentShell>
   );

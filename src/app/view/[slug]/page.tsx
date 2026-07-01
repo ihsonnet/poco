@@ -4,6 +4,7 @@ import { CollectionPage } from '@/components/CollectionPage';
 import { ContentShell } from '@/components/ContentShell';
 import { getCollectionSlugs } from '@/data/content';
 import { getRuntimeCollection } from '@/lib/publicContent';
+import { getRuntimeSiteSettings } from '@/lib/siteSettings';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -38,7 +39,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   if (!collection) notFound();
 
   return (
-    <ContentShell>
+    <ContentShell settings={await getRuntimeSiteSettings()}>
       <CollectionPage collection={collection} activeTag={tag} />
     </ContentShell>
   );

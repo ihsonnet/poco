@@ -35,7 +35,7 @@ export default async function Page({ params }: PageProps) {
   if (!post) notFound();
 
   return (
-    <AdminShell title="edit-post" action={<a className="admin-action" href="/admin/posts">back ↗</a>}>
+    <AdminShell navKey="posts" title="edit-post" action={<a className="admin-action" href="/admin/posts">back ↗</a>}>
       <PostForm action={updatePostAction.bind(null, id)} post={post} submitLabel="save changes" />
       <form className="admin-danger" action={deletePostAction.bind(null, id)}>
         <button type="submit">delete post</button>

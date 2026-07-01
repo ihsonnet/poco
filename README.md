@@ -46,8 +46,19 @@ Run the initial migration:
 npm run db:migrate
 ```
 
-Then visit `http://localhost:3000/admin/login`. The admin can create and edit posts with title, slug, type, route, post status (`draft`, `published`, `archived`), tags, cover slot, external URL, rich text paragraphs, gallery rows, and attachments.
+Seed the current homepage/archive content into the database:
+
+```bash
+npm run db:seed
+```
+
+The migration command uses the project `pg` dependency and reads `.env.local` automatically, so you do not need the `psql` CLI installed.
+The seed command uses the same source content as the current homepage and archive views, then inserts published posts, collections, and default site settings into PostgreSQL in an idempotent way.
+
+Then visit `http://localhost:3000/admin/login`. The admin can create and edit posts with title, slug, type, route, post status (`draft`, `published`, `archived`), tags, cover slot, cover image upload, external URL, rich text paragraphs, gallery image uploads, gallery rows, and attachments.
+Global header, hero, and footer content can be edited from `http://localhost:3000/admin/site`.
 Only `published` database records are read by `/view/[slug]`, `/blog/[slug]`, and `/details/[slug]`; `draft` and `archived` records stay hidden from the public site. If the database is not configured or has no published records, the current static portfolio content remains the fallback.
+Uploaded images are saved under structured folders: cover images go to `public/uploads/covers/YYYY/MM`, and gallery images go to `public/uploads/gallery/YYYY/MM`. Uploaded media is ignored by git except for `.gitkeep` placeholders, so back `public/uploads` up or mount persistent storage in production.
 
 ## Build
 

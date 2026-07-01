@@ -9,6 +9,7 @@ create table if not exists content_items (
   excerpt text not null default '',
   body jsonb not null default '[]'::jsonb,
   cover_slot text,
+  cover_image_url text,
   cover_fit text not null default 'cover' check (cover_fit in ('cover', 'contain')),
   year text,
   location text,
@@ -26,6 +27,7 @@ create table if not exists content_items (
 );
 
 alter table content_items add column if not exists external_url text;
+alter table content_items add column if not exists cover_image_url text;
 alter table content_items add column if not exists publication_status text not null default 'draft';
 alter table content_items drop constraint if exists content_items_publication_status_check;
 alter table content_items add constraint content_items_publication_status_check
@@ -87,6 +89,37 @@ create table if not exists content_gallery_images (
   check (slot is not null or image_url is not null)
 );
 
+create table if not exists site_settings (
+  id text primary key,
+  brand text not null default 'IHSONNET/',
+  contact_email text not null default '',
+  github_url text not null default '',
+  linkedin_url text not null default '',
+  nav_items jsonb not null default '[]'::jsonb,
+  hero_name text not null default '',
+  hero_last_name text not null default '',
+  hero_location text not null default '',
+  hero_status text not null default '',
+  hero_tagline text not null default '',
+  hero_lede text not null default '',
+  hero_tags jsonb not null default '[]'::jsonb,
+  hero_image_slot text,
+  hero_image_url text,
+  hero_view_work_label text not null default 'View work',
+  hero_view_work_href text not null default '#work',
+  footer_wordmark text not null default 'ihsonnet/',
+  footer_copyright text not null default '',
+  footer_tagline text not null default '',
+  home_section_order jsonb not null default '[]'::jsonb,
+  theme_light jsonb not null default '{}'::jsonb,
+  theme_dark jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table site_settings add column if not exists home_section_order jsonb not null default '[]'::jsonb;
+alter table site_settings add column if not exists theme_light jsonb not null default '{}'::jsonb;
+alter table site_settings add column if not exists theme_dark jsonb not null default '{}'::jsonb;
+
 create index if not exists content_items_type_idx on content_items(type);
 create index if not exists content_items_route_idx on content_items(route);
 create index if not exists content_items_published_idx on content_items(published);
@@ -112,4 +145,9 @@ for each row execute function set_updated_at();
 drop trigger if exists content_collections_updated_at on content_collections;
 create trigger content_collections_updated_at
 before update on content_collections
+for each row execute function set_updated_at();
+
+drop trigger if exists site_settings_updated_at on site_settings;
+create trigger site_settings_updated_at
+before update on site_settings
 for each row execute function set_updated_at();

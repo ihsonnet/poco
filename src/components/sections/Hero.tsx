@@ -1,33 +1,33 @@
-import { profile, heroTags } from '@/data/portfolio';
+import type { SiteSettings } from '@/lib/siteSettings';
 import { ImageSlot } from '@/components/ui/ImageSlot';
 import { ScrambleText } from '@/components/ui/ScrambleText';
 
-export function Hero() {
+export function Hero({ settings }: { settings: SiteSettings }) {
   return (
     <section id="top" className="hero-grid">
       <div className="hero-media-cell">
-        <ImageSlot slot="hero_portrait" placeholder="Image here" className="hero-img" alt="Portrait of Injamamul Haque Sonet" />
+        <ImageSlot src={settings.heroImageUrl || undefined} slot={settings.heroImageSlot || undefined} placeholder="Image here" className="hero-img" alt={`Portrait of ${settings.heroName} ${settings.heroLastName}`} />
       </div>
       <div className="hero-copy-cell">
         <div className="hero-kicker-row">
-          <ScrambleText>{profile.location}</ScrambleText>
-          <span className="open-status">{profile.status}<i /></span>
+          <ScrambleText>{settings.heroLocation}</ScrambleText>
+          <span className="open-status">{settings.heroStatus}<i /></span>
         </div>
         <div className="hero-main-copy">
           <h1 className="hero-name">
-            {profile.name}<br />
-            <span>{profile.lastName}</span>
+            {settings.heroName}<br />
+            <span>{settings.heroLastName}</span>
           </h1>
-          <ScrambleText className="hero-tag">{profile.tagline}</ScrambleText>
-          <p className="hero-lede">{profile.lede}</p>
+          <ScrambleText className="hero-tag">{settings.heroTagline}</ScrambleText>
+          <p className="hero-lede">{settings.heroLede}</p>
           <div className="hero-tags">
-            {heroTags.map((tag) => <span key={tag}>{tag}</span>)}
+            {settings.heroTags.map((tag) => <span key={tag}>{tag}</span>)}
           </div>
         </div>
         <div className="hero-cta">
-          <a href="#work">View work <span>↗</span></a>
-          <a href={profile.github}>GitHub <span>↗</span></a>
-          <a href={profile.linkedin}>LinkedIn <span>↗</span></a>
+          <a href={settings.heroViewWorkHref}>{settings.heroViewWorkLabel} <span>↗</span></a>
+          <a href={settings.githubUrl}>GitHub <span>↗</span></a>
+          <a href={settings.linkedinUrl}>LinkedIn <span>↗</span></a>
         </div>
       </div>
     </section>

@@ -26,6 +26,7 @@ interface PublicPostRow extends QueryResultRow {
   excerpt: string;
   body: string[];
   cover_slot: string | null;
+  cover_image_url: string | null;
   cover_fit: 'cover' | 'contain';
   year: string | null;
   location: string | null;
@@ -55,6 +56,7 @@ function mapPost(row: PublicPostRow): ContentPost {
     excerpt: row.excerpt,
     body: Array.isArray(row.body) ? row.body : [],
     coverSlot: row.cover_slot ?? undefined,
+    coverImageUrl: row.cover_image_url ?? undefined,
     coverFit: row.cover_fit,
     year: row.year ?? undefined,
     location: row.location ?? undefined,
@@ -80,6 +82,7 @@ async function queryPublishedPosts(where = '', values: unknown[] = []) {
       ci.excerpt,
       ci.body,
       ci.cover_slot,
+      ci.cover_image_url,
       ci.cover_fit,
       ci.year,
       ci.location,
@@ -89,7 +92,7 @@ async function queryPublishedPosts(where = '', values: unknown[] = []) {
       ci.publication_status,
       coalesce(array_agg(ct.name order by ct.name) filter (where ct.id is not null), '{}') as tags,
       coalesce((
-        select jsonb_agg(jsonb_build_object('slot', cgi.slot, 'alt', cgi.alt, 'caption', cgi.caption) order by cgi.sort_order)
+        select jsonb_agg(jsonb_build_object('slot', cgi.slot, 'imageUrl', cgi.image_url, 'alt', cgi.alt, 'caption', cgi.caption) order by cgi.sort_order)
         from content_gallery_images cgi
         where cgi.content_id = ci.id
       ), '[]'::jsonb) as gallery,

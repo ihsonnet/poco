@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "../.tmp/seed",
+    "rootDir": "..",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "incremental": false
+  },
+  "include": [
+    "../scripts/seed.ts",
+    "../src/data/contentShared.ts",
+    "../src/data/portfolio.ts",
+    "../src/lib/homeSections.ts",
+    "../src/types/portfolio.ts"
+  ]
+}

@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
-import { createPostAction } from '@/app/admin/actions';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { DatabaseNotice } from '@/components/admin/DatabaseNotice';
-import { PostForm } from '@/components/admin/PostForm';
+import { SiteSettingsOverview } from '@/components/admin/SiteSettingsSections';
 import { requireAdmin } from '@/lib/adminAuth';
 import { isDatabaseConfigured } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'New Post — IHSONNET Admin'
+  title: 'Settings - IHSONNET Admin'
 };
 
 export default async function Page() {
@@ -17,15 +16,15 @@ export default async function Page() {
 
   if (!isDatabaseConfigured()) {
     return (
-      <AdminShell title="new-post">
+      <AdminShell navKey="settings" title="settings">
         <DatabaseNotice />
       </AdminShell>
     );
   }
 
   return (
-    <AdminShell navKey="posts" title="new-post" action={<a className="admin-action" href="/admin/posts">back ↗</a>}>
-      <PostForm action={createPostAction} submitLabel="create post" />
+    <AdminShell navKey="settings" title="settings" action={<a className="admin-action" href="/admin/posts">back to posts</a>}>
+      <SiteSettingsOverview />
     </AdminShell>
   );
 }

@@ -4,6 +4,7 @@ import { DatabaseNotice } from '@/components/admin/DatabaseNotice';
 import { requireAdmin } from '@/lib/adminAuth';
 import { isDatabaseConfigured } from '@/lib/db';
 import { listAdminPosts } from '@/lib/adminContent';
+import { AdminPostsBoard } from '@/components/admin/AdminPostsBoard';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,27 +26,21 @@ export default async function Page() {
   const posts = await listAdminPosts();
 
   return (
-    <AdminShell title="posts" action={<a className="admin-action" href="/admin/posts/new">new post ↗</a>}>
-      <div className="admin-table">
-        <div className="admin-table-head">
-          <span>title</span>
-          <span>type</span>
-          <span>status</span>
-          <span>updated</span>
-        </div>
-        {posts.map((post) => (
-          <a href={`/admin/posts/${post.id}`} className="admin-table-row" key={post.id}>
-            <span>
-              <b>{post.title}</b>
-              <small>/{post.route}/{post.slug}</small>
-            </span>
-            <span>{post.type}</span>
-            <span>{post.publication_status}{post.featured ? ' · featured' : ''}</span>
-            <span>{new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(post.updated_at))}</span>
-          </a>
-        ))}
-        {!posts.length ? <p className="admin-empty">No database posts yet. Create the first record.</p> : null}
-      </div>
+    <AdminShell navKey="posts" title="posts" action={<a className="admin-action" href="/admin/posts/new">new post ↗</a>}>
+      <AdminPostsBoard posts={posts.map((post) => ({
+        id: post.id,
+        slug: post.slug,
+        type: post.type,
+        route: post.route,
+        title: post.title,
+        subtitle: post.subtitle,
+        coverSlot: post.cover_slot,
+        coverImageUrl: post.cover_image_url,
+        publicationStatus: post.publication_status,
+        featured: post.featured,
+        updatedAt: post.updated_at.toISOString(),
+        tags: post.tags
+      }))} />
     </AdminShell>
   );
 }
